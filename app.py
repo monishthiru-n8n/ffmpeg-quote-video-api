@@ -23,13 +23,26 @@ def generate_video():
     music_path = os.path.join(OUTPUT_FOLDER, f"{uuid.uuid4()}.mp3")
     video_path = os.path.join(OUTPUT_FOLDER, f"{uuid.uuid4()}.mp4")
 
-    try:
-        with open(image_path, 'wb') as f:
-            f.write(requests.get(image_url).content)
-        with open(music_path, 'wb') as f:
-            f.write(requests.get(music_url).content)
-    except Exception as e:
-        return jsonify({'error': 'Failed to download media'}), 500
+# Log the full FFmpeg command before execution
+print("📽️ Running FFmpeg Command:")
+print(" ".join(ffmpeg_command))
+
+try:
+    result = subprocess.run(ffmpeg_command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    print("✅ FFmpeg completed successfully.")
+    print("STDOUT:", result.stdout.decode())
+    print("STDERR:", result.stderr.decode())
+except subprocess.CalledProcessError as e:
+    print("❌ FFmpeg error occurred!")
+    print("Command:", " ".join(ffmpeg_command))
+    print("Return Code:", e.returncode)
+    print("STDERR:", e.stderr.decode())
+
+    return jsonify({
+        'error': 'FFmpeg processing failed',
+        'detail': e.stderr.decode()
+    }), 500
+
 
     # Create video using FFmpeg
     ffmpeg_command = [
