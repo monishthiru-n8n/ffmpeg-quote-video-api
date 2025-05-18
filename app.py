@@ -33,14 +33,15 @@ try:
     print("STDOUT:", result.stdout.decode())
     print("STDERR:", result.stderr.decode())
 except subprocess.CalledProcessError as e:
+    stderr_output = e.stderr.decode() if e.stderr else "No stderr captured"
     print("❌ FFmpeg error occurred!")
     print("Command:", " ".join(ffmpeg_command))
     print("Return Code:", e.returncode)
-    print("STDERR:", e.stderr.decode())
+    print("STDERR:", stderr_output)
 
     return jsonify({
         'error': 'FFmpeg processing failed',
-        'detail': e.stderr.decode()
+        'detail': stderr_output
     }), 500
 
 
