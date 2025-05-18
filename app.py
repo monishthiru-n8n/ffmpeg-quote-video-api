@@ -27,19 +27,22 @@ def generate_video():
     except Exception as e:
         return jsonify({'error': 'Failed to download media', 'detail': str(e)}), 500
 
-    # FFmpeg command
-    ffmpeg_command = [
-        'ffmpeg',
-        '-loop', '1',
-        '-i', image_path,
-        '-i', music_path,
-        '-c:v', 'libx264',
-        '-t', '10',
-        '-vf', f"drawtext=text='{quote.replace(\"'\", \"\\'\")}':fontcolor=white:fontsize=24:x=(w-text_w)/2:y=(h-text_h)/2",
-        '-pix_fmt', 'yuv420p',
-        '-y',
-        video_path
-    ]
+   # Escape quote text safely
+safe_quote = quote.replace("'", "\\'")
+
+ffmpeg_command = [
+    'ffmpeg',
+    '-loop', '1',
+    '-i', image_path,
+    '-i', music_path,
+    '-c:v', 'libx264',
+    '-t', '10',
+    '-vf', f"drawtext=text='{safe_quote}':fontcolor=white:fontsize=24:x=(w-text_w)/2:y=(h-text_h)/2",
+    '-pix_fmt', 'yuv420p',
+    '-y',
+    video_path
+]
+
 
     # Run FFmpeg with error logging
     try:
